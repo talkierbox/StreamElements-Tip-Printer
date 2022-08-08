@@ -1,0 +1,6 @@
+{
+    "accountID": "[Enter Streamelements Account ID Here]",
+    "jwtToken": "[Enter Streamelements JWT Token Here]",
+    "minimumDonationAmount": 9.98,
+    "enablePrinting": false
+}

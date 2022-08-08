@@ -1,0 +1,14 @@
+# Node Modules
+node_modules/
+
+# Compiled Code
+dist/**/*.js
+dist/**/*.map
+dist/**/*.json
+
+# Sensitive Data
+src/settings.json
+settings/
+
+## Temp Files
+temp/**/*.pdf
