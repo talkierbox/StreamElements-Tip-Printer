@@ -1,9 +1,9 @@
 // https://www.npmjs.com/package/node-streamelements
-// Rewritten in TS for ease of use
+// Rewritten in TS for ease of use - No Linting because that's a little too much work
 // Thank you to Ryan Barr for writing this library!
 
 import request from 'request';
-const HTTP = { GET: 'GET', POST: 'POST', PUT: 'PUT', DELETE: 'DELETE' };
+const HTTP = { GET: `GET`, POST: `POST`, PUT: `PUT`, DELETE: `DELETE` };
 
 export class Wrapper {
 
@@ -11,9 +11,9 @@ export class Wrapper {
     jwt: string;
     accountId: string;
 
-  constructor(jwt, accountId, base?) {
+  constructor(jwt: string, accountId: string, base?: string) {
     // Establish the base URL for the API.
-    this.base = base || 'https://api.streamelements.com/kappa/v2';
+    this.base = base || `https://api.streamelements.com/kappa/v2`;
 
     // Store the user's access token in the instance.
     this.jwt = jwt;
@@ -24,7 +24,7 @@ export class Wrapper {
   }
 
   // Create a generic request wrapper.
-  private makeRequest(method, path, body?, qs?) {
+  private makeRequest(method: string, path: string, body?: { message?: any; username?: any; level?: any; id?: string; role?: any; optionId?: any; amount?: any; winnerId?: any; tickets?: any; song?: any; volume?: number; rating?: any; }, qs?: { limit?: any; offset?: any; text?: any; voice?: string; pending?: any; }) {
 
     // Return a promise to allow developers to appropriately handle API responses.
     return new Promise((resolve, reject) => {
@@ -38,7 +38,7 @@ export class Wrapper {
         headers: {
           'Authorization': `Bearer ${this.jwt}`
         }
-      }, (error, response, responseBody) => {
+      }, (error: any, response: { statusCode: number; }, responseBody: any) => {
 
         // If there is a request error, reject the Promise.
         if (error) {
@@ -68,10 +68,10 @@ export class Wrapper {
   getActivities(channel = this.accountId) {
     return this.makeRequest(HTTP.GET, `activities/${channel}`);
   }
-  getActivity(activityId, channel = this.accountId) {
+  getActivity(activityId: any, channel = this.accountId) {
     return this.makeRequest(HTTP.GET, `activities/${channel}/${activityId}`);
   }
-  replayActivity(activityId, channel = this.accountId) {
+  replayActivity(activityId: any, channel = this.accountId) {
     return this.makeRequest(HTTP.POST, `activities/${channel}/${activityId}/replay`);
   }
 
@@ -82,7 +82,7 @@ export class Wrapper {
   botPartChannel(channel = this.accountId) {
     return this.makeRequest(HTTP.POST, `bot/${channel}/part`);
   }
-  botSay(message, channel = this.accountId) {
+  botSay(message: any, channel = this.accountId) {
     return this.makeRequest(HTTP.POST, `bot/${channel}/say`, { message });
   }
   botJoinChannel(channel = this.accountId) {
@@ -97,24 +97,24 @@ export class Wrapper {
   getBotUserLevels(channel = this.accountId) {
     return this.makeRequest(HTTP.GET, `bot/${channel}/levels`);
   }
-  setBotUserLevel(username, level, channel = this.accountId) {
+  setBotUserLevel(username: any, level: any, channel = this.accountId) {
     return this.makeRequest(HTTP.POST, `bot/${channel}/levels`, { username, level });
   }
-  deleteBotUserLevel(username, channel = this.accountId) {
-    return this.makeRequest(HTTP.DELETE, `bot/${channel}/levels/${username}`, { id: 'levels' });
+  deleteBotUserLevel(username: any, channel = this.accountId) {
+    return this.makeRequest(HTTP.DELETE, `bot/${channel}/levels/${username}`, { id: `levels` });
   }
 
   // /bot/commands
   getBotCommands(channel = this.accountId) {
     return this.makeRequest(HTTP.GET, `bot/commands/${channel}`);
   }
-  createBotCommand(options, channel = this.accountId) {
+  createBotCommand(options: any, channel = this.accountId) {
     return this.makeRequest(HTTP.POST, `bot/commands/${channel}`, options);
   }
   getDefaultBotCommands(channel = this.accountId) {
     return this.makeRequest(HTTP.GET, `bot/commands/${channel}/default`);
   }
-  updateDefaultBotCommand(commandId, options, channel = this.accountId) {
+  updateDefaultBotCommand(commandId: any, options: any, channel = this.accountId) {
     return this.makeRequest(HTTP.PUT, `bot/commands/${channel}/default/${commandId}`, options);
   }
 
@@ -122,16 +122,16 @@ export class Wrapper {
   getBotTimers(channel = this.accountId) {
     return this.makeRequest(HTTP.GET, `bot/timers/${channel}`);
   }
-  createBotTimer(options, channel = this.accountId) {
+  createBotTimer(options: any, channel = this.accountId) {
     return this.makeRequest(HTTP.POST, `bot/timers/${channel}`, options);
   }
-  getBotTimer(timerId, channel = this.accountId) {
+  getBotTimer(timerId: any, channel = this.accountId) {
     return this.makeRequest(HTTP.GET, `bot/timers/${channel}/${timerId}`);
   }
-  updateBotTimer(timerId, options, channel = this.accountId) {
+  updateBotTimer(timerId: any, options: any, channel = this.accountId) {
     return this.makeRequest(HTTP.PUT, `bot/timers/${channel}/${timerId}`, options);
   }
-  deleteBotTimer(timerId, channel = this.accountId) {
+  deleteBotTimer(timerId: any, channel = this.accountId) {
     return this.makeRequest(HTTP.DELETE, `bot/timers/${channel}/${timerId}`);
   }
 
@@ -156,16 +156,16 @@ export class Wrapper {
   getChannelDetails(channel = this.accountId) {
     return this.makeRequest(HTTP.GET, `channels/${channel}/details`);
   }
-  updateChannelProfile(options, channel = this.accountId) {
+  updateChannelProfile(options: any, channel = this.accountId) {
     return this.makeRequest(HTTP.PUT, `channels/${channel}/profile`, options);
   }
   getChannelUsers(channel = this.accountId) {
     return this.makeRequest(HTTP.GET, `channels/${channel}/users`);
   }
-  updateUserAccessLevel(userId, role, channel = this.accountId) {
-    return this.makeRequest(HTTP.PUT, `channels/${channel}/users/${userId}`, { role })
+  updateUserAccessLevel(userId: any, role: any, channel = this.accountId) {
+    return this.makeRequest(HTTP.PUT, `channels/${channel}/users/${userId}`, { role });
   }
-  deleteUserAccess(userId, channel = this.accountId) {
+  deleteUserAccess(userId: any, channel = this.accountId) {
     return this.makeRequest(HTTP.DELETE, `channels/${channel}/users/${userId}`);
   }
   roleplayAsUser(channel = this.accountId) {
@@ -176,37 +176,37 @@ export class Wrapper {
   getContests(channel = this.accountId) {
     return this.makeRequest(HTTP.GET, `contests/${channel}`);
   }
-  createContest(options, channel = this.accountId) {
+  createContest(options: any, channel = this.accountId) {
     return this.makeRequest(HTTP.POST, `contests/${channel}`, options);
   }
   getCompletedContests(channel = this.accountId) {
     return this.makeRequest(HTTP.GET, `contests/${channel}/history`);
   }
-  getContest(contestId, channel = this.accountId) {
+  getContest(contestId: any, channel = this.accountId) {
     return this.makeRequest(HTTP.GET, `contests/${channel}/${contestId}`);
   }
-  updateContest(contestId, options, channel = this.accountId) {
+  updateContest(contestId: any, options: any, channel = this.accountId) {
     return this.makeRequest(HTTP.PUT, `contests/${channel}/${contestId}`, options);
   }
-  deleteContest(contestId, channel = this.accountId) {
+  deleteContest(contestId: any, channel = this.accountId) {
     return this.makeRequest(HTTP.DELETE, `contests/${channel}/${contestId}`);
   }
-  createContestBet(contestId, optionId, amount, channel = this.accountId) {
+  createContestBet(contestId: any, optionId: any, amount: any, channel = this.accountId) {
     return this.makeRequest(HTTP.POST, `contests/${channel}/${contestId}/bet`, { optionId, amount });
   }
-  getContestBet(contestId, channel = this.accountId) {
+  getContestBet(contestId: any, channel = this.accountId) {
     return this.makeRequest(HTTP.GET, `contests/${channel}/${contestId}/bet`);
   }
-  startContest(contestId, channel = this.accountId) {
+  startContest(contestId: any, channel = this.accountId) {
     return this.makeRequest(HTTP.PUT, `contests/${channel}/${contestId}/start`);
   }
-  setContestWinner(contestId, winnerId, channel = this.accountId) {
+  setContestWinner(contestId: any, winnerId: any, channel = this.accountId) {
     return this.makeRequest(HTTP.PUT, `contests/${channel}/${contestId}/winner`, { winnerId });
   }
-  refundContest(contestId, channel = this.accountId) {
+  refundContest(contestId: any, channel = this.accountId) {
     return this.makeRequest(HTTP.DELETE, `contests/${channel}/${contestId}/refund`);
   }
-  closeContest(contestId, channel = this.accountId) {
+  closeContest(contestId: any, channel = this.accountId) {
     return this.makeRequest(HTTP.DELETE, `contests/${channel}/${contestId}/stop`);
   }
 
@@ -214,34 +214,34 @@ export class Wrapper {
   getGiveaways(channel = this.accountId) {
     return this.makeRequest(HTTP.GET, `giveaways/${channel}`);
   }
-  createGiveaway(options, channel = this.accountId) {
+  createGiveaway(options: any, channel = this.accountId) {
     return this.makeRequest(HTTP.POST, `giveaways/${channel}`);
   }
   getPastGiveaways(channel = this.accountId) {
     return this.makeRequest(HTTP.GET, `giveaways/${channel}/history`);
   }
-  getGiveaway(giveawayId, channel = this.accountId) {
+  getGiveaway(giveawayId: any, channel = this.accountId) {
     return this.makeRequest(HTTP.GET, `giveaways/${channel}/${giveawayId}`);
   }
-  buyGiveawayTickets(giveawayId, tickets, channel = this.accountId) {
+  buyGiveawayTickets(giveawayId: any, tickets: any, channel = this.accountId) {
     return this.makeRequest(HTTP.POST, `giveaways/${channel}/${giveawayId}`, { tickets });
   }
-  updateGiveaway(giveawayId, options, channel = this.accountId) {
+  updateGiveaway(giveawayId: any, options: any, channel = this.accountId) {
     return this.makeRequest(HTTP.PUT, `giveaways/${channel}/${giveawayId}`, options);
   }
-  deleteGiveaway(giveawayId, channel = this.accountId) {
+  deleteGiveaway(giveawayId: any, channel = this.accountId) {
     return this.makeRequest(HTTP.DELETE, `giveaways/${channel}/${giveawayId}`);
   }
-  getUserGiveawayStatus(giveawayId, channel = this.accountId) {
+  getUserGiveawayStatus(giveawayId: any, channel = this.accountId) {
     return this.makeRequest(HTTP.GET, `giveaways/${channel}/${giveawayId}/joined`);
   }
-  completeGiveaway(giveawayId, channel = this.accountId) {
+  completeGiveaway(giveawayId: any, channel = this.accountId) {
     return this.makeRequest(HTTP.PUT, `giveaways/${channel}/${giveawayId}/complete`);
   }
-  refundGiveaway(giveawayId, channel = this.accountId) {
+  refundGiveaway(giveawayId: any, channel = this.accountId) {
     return this.makeRequest(HTTP.DELETE, `giveaways/${channel}/${giveawayId}/refund`);
   }
-  closeGiveaway(giveawayId, channel = this.accountId) {
+  closeGiveaway(giveawayId: any, channel = this.accountId) {
     return this.makeRequest(HTTP.DELETE, `giveaways/${channel}/${giveawayId}/close`);
   }
 
@@ -254,7 +254,7 @@ export class Wrapper {
   getLoyaltySettings(channel = this.accountId) {
     return this.makeRequest(HTTP.GET, `loyalty/${channel}`);
   }
-  updateLoyaltySettings(options, channel = this.accountId) {
+  updateLoyaltySettings(options: any, channel = this.accountId) {
     return this.makeRequest(HTTP.PUT, `loyalty/${channel}`, options);
   }
 
@@ -262,36 +262,36 @@ export class Wrapper {
   getOverlays(channel = this.accountId) {
     return this.makeRequest(HTTP.GET, `overlays/${channel}`);
   }
-  createOverlay(options, channel = this.accountId) {
+  createOverlay(options: any, channel = this.accountId) {
     return this.makeRequest(HTTP.POST, `overlays/${channel}`, options);
   }
-  getOverlay(overlayId, channel = this.accountId) {
+  getOverlay(overlayId: any, channel = this.accountId) {
     return this.makeRequest(HTTP.GET, `overlays/${channel}/${overlayId}`);
   }
-  updateOverlay(overlayId, options, channel = this.accountId) {
+  updateOverlay(overlayId: any, options: any, channel = this.accountId) {
     return this.makeRequest(HTTP.PUT, `overlays/${channel}/${overlayId}`, options);
   }
-  deleteOverlay(overlayId, channel = this.accountId) {
+  deleteOverlay(overlayId: any, channel = this.accountId) {
     return this.makeRequest(HTTP.DELETE, `overlays/${channel}/${overlayId}`);
   }
 
   // /points
-  updatePoints(options, channel = this.accountId) {
+  updatePoints(options: any, channel = this.accountId) {
     return this.makeRequest(HTTP.PUT, `points/${channel}`, options);
   }
-  getUserPoints(userId, channel = this.accountId) {
+  getUserPoints(userId: any, channel = this.accountId) {
     return this.makeRequest(HTTP.GET, `points/${channel}/${userId}`);
   }
-  deleteUserPoints(userId, channel = this.accountId) {
+  deleteUserPoints(userId: any, channel = this.accountId) {
     return this.makeRequest(HTTP.DELETE, `points/${channel}/${userId}`);
   }
-  addUserPoints(userId, amount, channel = this.accountId) {
+  addUserPoints(userId: any, amount: number, channel = this.accountId) {
     return this.makeRequest(HTTP.PUT, `points/${channel}/${userId}/${Math.abs(amount)}`);
   }
-  removeUserPoints(userId, amount, channel = this.accountId) {
+  removeUserPoints(userId: any, amount: number, channel = this.accountId) {
     return this.makeRequest(HTTP.PUT, `points/${channel}/${userId}/${-Math.abs(amount)}`);
   }
-  getUserRank(userId, channel = this.accountId) {
+  getUserRank(userId: any, channel = this.accountId) {
     return this.makeRequest(HTTP.GET, `points/${channel}/${userId}/rank`);
   }
   resetPointsLeaderboard(channel = this.accountId) {
@@ -300,10 +300,10 @@ export class Wrapper {
   resetAlltimePointsLeaderboard(channel = this.accountId) {
     return this.makeRequest(HTTP.DELETE, `points/${channel}/reset/alltime`);
   }
-  getTopPointsUsersAlltime(limit, offset, channel = this.accountId) {
+  getTopPointsUsersAlltime(limit: any, offset: any, channel = this.accountId) {
     return this.makeRequest(HTTP.GET, `points/${channel}/alltime`, {}, { limit, offset });
   }
-  getTopPointsUsers(limit, offset, channel = this.accountId) {
+  getTopPointsUsers(limit: any, offset: any, channel = this.accountId) {
     return this.makeRequest(HTTP.GET, `points/${channel}/top`, {}, { limit, offset });
   }
 
@@ -311,7 +311,7 @@ export class Wrapper {
   getUserSessionData(channel = this.accountId) {
     return this.makeRequest(HTTP.GET, `sessions/${channel}`);
   }
-  updateUserSessionData(options, channel = this.accountId) {
+  updateUserSessionData(options: any, channel = this.accountId) {
     return this.makeRequest(HTTP.PUT, `sessions/${channel}`, options);
   }
   resetUserSessionData(channel = this.accountId) {
@@ -325,7 +325,7 @@ export class Wrapper {
   getSongRequestSettings(channel = this.accountId) {
     return this.makeRequest(HTTP.GET, `songrequest/${channel}/settings`);
   }
-  updateSongRequestSettings(options, channel = this.accountId) {
+  updateSongRequestSettings(options: any, channel = this.accountId) {
     return this.makeRequest(HTTP.PUT, `songrequest/${channel}/settings`, options);
   }
   getPublicSongRequestSettings(channel = this.accountId) {
@@ -334,7 +334,7 @@ export class Wrapper {
   getSongRequestQueue(channel = this.accountId) {
     return this.makeRequest(HTTP.GET, `songrequest/${channel}/queue`);
   }
-  createSongRequest(song, channel = this.accountId) {
+  createSongRequest(song: any, channel = this.accountId) {
     return this.makeRequest(HTTP.POST, `songrequest/${channel}/queue`, { song });
   }
   getSongRequestHistory(channel = this.accountId) {
@@ -343,7 +343,7 @@ export class Wrapper {
   skipCurrentSong(channel = this.accountId) {
     return this.makeRequest(HTTP.DELETE, `songrequest/${channel}/queue/skip`);
   }
-  deleteSongRequest(songId, channel = this.accountId) {
+  deleteSongRequest(songId: any, channel = this.accountId) {
     return this.makeRequest(HTTP.DELETE, `songrequest/${channel}/queue/${songId}`);
   }
   clearSongRequestQueue(channel = this.accountId) {
@@ -352,16 +352,16 @@ export class Wrapper {
   getCurrentSong(channel = this.accountId) {
     return this.makeRequest(HTTP.GET, `songrequest/${channel}/playing`);
   }
-  setSongRequestVolume(volumeAmount, channel = this.accountId) {
+  setSongRequestVolume(volumeAmount: string, channel = this.accountId) {
     const volume = parseInt(volumeAmount, 10);
     if (isNaN(volume) || volume < 0 || volume > 100) {
-      throw new Error('volumeAmount should be a number between 0 and 100.');
+      throw new Error(`volumeAmount should be a number between 0 and 100.`);
     }
     return this.makeRequest(HTTP.POST, `songrequest/${channel}/player/volume`, { volume });
   }
 
   // /speech
-  generateSpeech(text, voice = 'Joanna') {
+  generateSpeech(text: any, voice = `Joanna`) {
     return this.makeRequest(HTTP.GET, `speech`, {}, { text, voice });
   }
   getSpeechVoices() {
@@ -380,31 +380,31 @@ export class Wrapper {
   getStoreItems(channel = this.accountId) {
     return this.makeRequest(HTTP.GET, `store/${channel}/items`);
   }
-  createStoreItem(options, channel = this.accountId) {
+  createStoreItem(options: any, channel = this.accountId) {
     return this.makeRequest(HTTP.POST, `store/${channel}/items`, options);
   }
-  getStoreItem(itemId, channel = this.accountId) {
+  getStoreItem(itemId: any, channel = this.accountId) {
     return this.makeRequest(HTTP.GET, `store/${channel}/items/${itemId}`);
   }
-  updateStoreItem(itemId, options, channel = this.accountId) {
+  updateStoreItem(itemId: any, options: any, channel = this.accountId) {
     return this.makeRequest(HTTP.PUT, `store/${channel}/items/${itemId}`);
   }
-  deleteStoreItem(itemId, channel = this.accountId) {
+  deleteStoreItem(itemId: any, channel = this.accountId) {
     return this.makeRequest(HTTP.DELETE, `store/${channel}/items/${itemId}`);
   }
-  getStoreRedemptions(limit, offset, pending, channel = this.accountId) {
+  getStoreRedemptions(limit: any, offset: any, pending: any, channel = this.accountId) {
     return this.makeRequest(HTTP.GET, `store/${channel}/redemptions`, {}, { limit, offset, pending });
   }
-  getStoreRedemption(redemptionId, channel = this.accountId) {
+  getStoreRedemption(redemptionId: any, channel = this.accountId) {
     return this.makeRequest(HTTP.GET, `store/${channel}/redemptions/${redemptionId}`);
   }
-  updateStoreRedemption(redemptionId, options, channel = this.accountId) {
+  updateStoreRedemption(redemptionId: any, options: any, channel = this.accountId) {
     return this.makeRequest(HTTP.PUT, `store/${channel}/redemptions/${redemptionId}`, options);
   }
-  deleteStoreRedemption(redemptionId, options, channel = this.accountId) {
+  deleteStoreRedemption(redemptionId: any, options: any, channel = this.accountId) {
     return this.makeRequest(HTTP.DELETE, `store/${channel}/redemptions/${redemptionId}`);
   }
-  createStoreRedemption(itemId, channel = this.accountId) {
+  createStoreRedemption(itemId: any, channel = this.accountId) {
     return this.makeRequest(HTTP.POST, `store/${channel}/redemptions/${itemId}`);
   }
 
@@ -415,7 +415,7 @@ export class Wrapper {
   getStreamStatus(channel = this.accountId) {
     return this.makeRequest(HTTP.GET, `streams/${channel}/live`);
   }
-  getStreamDetails(streamId, channel = this.accountId) {
+  getStreamDetails(streamId: any, channel = this.accountId) {
     return this.makeRequest(HTTP.GET, `streams/${channel}/${streamId}`);
   }
 
@@ -423,16 +423,16 @@ export class Wrapper {
   getThemes() {
     return this.makeRequest(HTTP.GET, `themes`);
   }
-  getTheme(themeId) {
+  getTheme(themeId: any) {
     return this.makeRequest(HTTP.GET, `themes/${themeId}`);
   }
-  createOverlayFromTheme(themeId, options) {
+  createOverlayFromTheme(themeId: any, options: any) {
     return this.makeRequest(HTTP.POST, `themes/${themeId}`, options);
   }
-  rateTheme(themeId, rating) {
+  rateTheme(themeId: any, rating: any) {
     return this.makeRequest(HTTP.POST, `themes/${themeId}/rate`, { rating });
   }
-  getThemeRatingForChannel(themeId, channel = this.accountId) {
+  getThemeRatingForChannel(themeId: any, channel = this.accountId) {
     return this.makeRequest(HTTP.GET, `themes/${themeId}/${channel}/rating`);
   }
 
@@ -443,7 +443,7 @@ export class Wrapper {
   getTippingSettings(channel = this.accountId) {
     return this.makeRequest(HTTP.GET, `tipping/${channel}`);
   }
-  updateTippingSettings(options, channel = this.accountId) {
+  updateTippingSettings(options: any, channel = this.accountId) {
     return this.makeRequest(HTTP.PUT, `tipping/${channel}`, options);
   }
 
@@ -451,7 +451,7 @@ export class Wrapper {
   getTips(channel = this.accountId) {
     return this.makeRequest(HTTP.GET, `tips/${channel}`);
   }
-  createTip(options, channel = this.accountId) {
+  createTip(options: any, channel = this.accountId) {
     return this.makeRequest(HTTP.POST, `tips/${channel}`, options);
   }
   getTopTippers(channel = this.accountId) {
@@ -463,13 +463,13 @@ export class Wrapper {
   getRecentTips(channel = this.accountId) {
     return this.makeRequest(HTTP.GET, `tips/${channel}/moderation`);
   }
-  getTip(tipId, channel = this.accountId) {
+  getTip(tipId: any, channel = this.accountId) {
     return this.makeRequest(HTTP.GET, `tips/${channel}/${tipId}`);
   }
-  updateTip(tipId, options, channel = this.accountId) {
+  updateTip(tipId: any, options: any, channel = this.accountId) {
     return this.makeRequest(HTTP.PUT, `tips/${channel}/${tipId}`, options);
   }
-  deleteTip(tipId, channel = this.accountId) {
+  deleteTip(tipId: any, channel = this.accountId) {
     return this.makeRequest(HTTP.DELETE, `tips/${channel}/${tipId}`);
   }
 
@@ -477,7 +477,7 @@ export class Wrapper {
   getAssets(channel = this.accountId) {
     return this.makeRequest(HTTP.GET, `uploads/${channel}`);
   }
-  deleteAsset(assetId, channel = this.accountId) {
+  deleteAsset(assetId: any, channel = this.accountId) {
     return this.makeRequest(HTTP.DELETE, `uploads/${channel}/${assetId}`);
   }
 

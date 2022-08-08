@@ -1,0 +1,26 @@
+# Compiled Code
+dist/
+
+# Node Modules
+node_modules/
+
+# Code that isn't really my own
+src/modules/Wrapper.ts
+
+# .vscode
+.vscode/
+
+# EJS files
+*.ejs 
+
+# Text files and Data Files
+*.txt 
+*.json
+*.map
+*.env
+
+# Unrelated Stuff
+*.bat
+*.sh
+*.md 
+*.example

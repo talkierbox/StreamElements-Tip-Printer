@@ -12,3 +12,6 @@ settings/
 
 ## Temp Files
 temp/**/*.pdf
+
+# VSCode Settings
+.vscode/

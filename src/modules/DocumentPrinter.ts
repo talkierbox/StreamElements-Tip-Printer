@@ -4,19 +4,19 @@ import * as Downloader from 'image-downloader';
 import fs from 'fs';
 import path from 'path';
 import PDFKit from 'pdfkit';
-const isImageURL = require('image-url-validator').default;
+const isImageURL = require(`image-url-validator`).default;
 
 export class DonoPrinter {
     tempFilesPath: string;
     printingEnabled: boolean;
 
-    constructor(tempFilesPath = "./temp", printingEnabled: boolean = false){
+    constructor(tempFilesPath = `./temp`, printingEnabled = false){
         this.tempFilesPath = tempFilesPath;
         printKit.getDefaultPrinter().then(data => {
             console.log(`[PRINTER] Using Printer: ${data.name} - This is your device default printer!`);
             console.log(`[PRINTER] Allow Printing Setting: ${printingEnabled}`);
         });
-        
+
         // Purge PDFs and Images
         this.purgePDFs();
         this.purgeImages();
@@ -35,26 +35,26 @@ export class DonoPrinter {
                 return img;
         }
         else {
-            return {filename: ""};
+            return {filename: ``};
         }
     }
 
-    public async printDonation(dono: Donation){
+    public async printDonation(dono: Donation): Promise<void> {
         let filePathsToDel = [];
 
-        // First download the image 
-        let donationMessageSplitter = dono.message.replace("\n", " ").split(" ");
+        // First download the image
+        let donationMessageSplitter = dono.message.replace(`\n`, ` `).split(` `);
         let donoURL = null;
 
         let donoMessage = ``;
 
         for (let i = 0; i < donationMessageSplitter.length; i++) {
             let element = donationMessageSplitter[i].toLowerCase();
-            if(element.includes('.png') || element.includes('.jpg') || element.includes('.jpeg') || await isImageURL(element)) {
+            if(element.includes(`.png`) || element.includes(`.jpg`) || element.includes(`.jpeg`) || await isImageURL(element)) {
                 donoURL = donationMessageSplitter[i];
             }
             else {
-                donoMessage += donationMessageSplitter[i] + " ";
+                donoMessage += donationMessageSplitter[i] + ` `;
             }
         }
 
@@ -63,25 +63,25 @@ export class DonoPrinter {
         filePathsToDel.push(`${this.tempFilesPath}/printables/donation_${dono.id}.pdf`);
 
         // Add the username
-        doc.font('./fonts/Lato-Bold.ttf').fontSize(17)
+        doc.font(`./fonts/Lato-Bold.ttf`).fontSize(17)
         .text(`${dono.username} - $${dono.amount}`, 100, 50, {
-          align: 'center',
-          valign: 'center'
+          align: `center`,
+          valign: `center`
         });
 
         if(donoMessage) {
             // Add the Donation Message
-            doc.font('./fonts/Lato-Regular.ttf').fontSize(23)
+            doc.font(`./fonts/Lato-Regular.ttf`).fontSize(23)
             .text(donoMessage, 100, 100);
         }
-        
+
         if(donoURL) {
             await this.downloadImage(donoURL, dono.id).then(async (data) => {
                 if(data.filename){
                     await doc.image(data.filename, {
                         fit: [400, 400],
-                        align: 'center',
-                        valign: 'center',
+                        align: `center`,
+                        valign: `center`,
                         y: 300
                     });
 
@@ -101,37 +101,37 @@ export class DonoPrinter {
         }
 
         // Delete the files
-        setTimeout(async function() {
+        setTimeout(async () => {
             filePathsToDel.forEach(async (path) => {
                 if(fs.existsSync(path)) fs.unlinkSync(path);
             });
         }, 10 * 1000);
     }
 
-    async purgePDFs(){
+    async purgePDFs(): Promise<void> {
         fs.readdir(`${this.tempFilesPath}/printables`, (err, files) => {
             if (err) throw err;
             for (const file of files) {
-                if(file.endsWith('.txt')) continue;
+                if(file.endsWith(`.txt`)) continue;
             fs.unlink(path.join(`${this.tempFilesPath}/printables`, file), err => {
                 if (err) throw err;
             });
             }
         });
-        console.log("[PRINTER] Purged All PDFs!");
+        console.log(`[PRINTER] Purged All PDFs!`);
     }
 
-    async purgeImages(){
+    async purgeImages(): Promise<void> {
         fs.readdir(`${this.tempFilesPath}/img`, (err, files) => {
             if (err) throw err;
-        
+
             for (const file of files) {
-                if(file.endsWith('.txt')) continue;
+                if(file.endsWith(`.txt`)) continue;
             fs.unlink(path.join(`${this.tempFilesPath}/img`, file), err => {
                 if (err) throw err;
             });
             }
         });
-        console.log("[PRINTER] Purged All Images!");
+        console.log(`[PRINTER] Purged All Images!`);
     }
 }
