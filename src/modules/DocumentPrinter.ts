@@ -10,7 +10,7 @@ export class DonoPrinter {
     tempFilesPath: string;
     printingEnabled: boolean;
 
-    constructor(tempFilesPath = `./temp`, printingEnabled = false){
+    constructor(tempFilesPath = `./temp`, printingEnabled = false) {
         this.tempFilesPath = tempFilesPath;
         printKit.getDefaultPrinter().then(data => {
             console.log(`[PRINTER] Using Printer: ${data.name} - This is your device default printer!`);
@@ -21,12 +21,12 @@ export class DonoPrinter {
         this.purgePDFs();
         this.purgeImages();
 
-        if(printingEnabled) this.printingEnabled = true;
+        if (printingEnabled) this.printingEnabled = true;
         else this.printingEnabled = false;
     }
 
     private async downloadImage(url, donoID): Promise<Downloader.DownloadResult> {
-        if(await isImageURL(url)) {
+        if (await isImageURL(url)) {
                 let img = await Downloader.image({
                     url: url,
                     dest: `../../${this.tempFilesPath}/img/${donoID}`,
@@ -50,7 +50,7 @@ export class DonoPrinter {
 
         for (let i = 0; i < donationMessageSplitter.length; i++) {
             let element = donationMessageSplitter[i].toLowerCase();
-            if(element.includes(`.png`) || element.includes(`.jpg`) || element.includes(`.jpeg`) || await isImageURL(element)) {
+            if (element.includes(`.png`) || element.includes(`.jpg`) || element.includes(`.jpeg`) || await isImageURL(donationMessageSplitter[i])) {
                 donoURL = donationMessageSplitter[i];
             }
             else {
@@ -69,15 +69,15 @@ export class DonoPrinter {
           valign: `center`
         });
 
-        if(donoMessage) {
+        if (donoMessage) {
             // Add the Donation Message
             doc.font(`./fonts/Lato-Regular.ttf`).fontSize(23)
             .text(donoMessage, 100, 100);
         }
 
-        if(donoURL) {
+        if (donoURL) {
             await this.downloadImage(donoURL, dono.id).then(async (data) => {
-                if(data.filename){
+                if (data.filename) {
                     await doc.image(data.filename, {
                         fit: [400, 400],
                         align: `center`,
@@ -86,24 +86,24 @@ export class DonoPrinter {
                     });
 
                     await doc.end();
-                    if(this.printingEnabled) printKit.print(`${this.tempFilesPath}/printables/donation_${dono.id}.pdf`);
+                    if (this.printingEnabled) printKit.print(`${this.tempFilesPath}/printables/donation_${dono.id}.pdf`);
 
                     filePathsToDel.push(data.filename);
                 } else {
                     await doc.end();
-                    if(this.printingEnabled) printKit.print(`${this.tempFilesPath}/printables/donation_${dono.id}.pdf`);
+                    if (this.printingEnabled) printKit.print(`${this.tempFilesPath}/printables/donation_${dono.id}.pdf`);
                 }
             });
         }
         else {
             await doc.end();
-            if(this.printingEnabled) printKit.print(`${this.tempFilesPath}/printables/donation_${dono.id}.pdf`);
+            if (this.printingEnabled) printKit.print(`${this.tempFilesPath}/printables/donation_${dono.id}.pdf`);
         }
 
         // Delete the files
         setTimeout(async () => {
             filePathsToDel.forEach(async (path) => {
-                if(fs.existsSync(path)) fs.unlinkSync(path);
+                if (fs.existsSync(path)) fs.unlinkSync(path);
             });
         }, 10 * 1000);
     }
@@ -112,7 +112,7 @@ export class DonoPrinter {
         fs.readdir(`${this.tempFilesPath}/printables`, (err, files) => {
             if (err) throw err;
             for (const file of files) {
-                if(file.endsWith(`.txt`)) continue;
+                if (file.endsWith(`.txt`)) continue;
             fs.unlink(path.join(`${this.tempFilesPath}/printables`, file), err => {
                 if (err) throw err;
             });
@@ -126,7 +126,7 @@ export class DonoPrinter {
             if (err) throw err;
 
             for (const file of files) {
-                if(file.endsWith(`.txt`)) continue;
+                if (file.endsWith(`.txt`)) continue;
             fs.unlink(path.join(`${this.tempFilesPath}/img`, file), err => {
                 if (err) throw err;
             });

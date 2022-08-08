@@ -16,7 +16,7 @@ Client.on(`ready`, async (data) => {
 });
 
 Client.on(`donation`, async (donationData: Donation) => {
-    if(settings.minimumDonationAmount > donationData.amount) return;
+    if (settings.minimumDonationAmount > donationData.amount) return;
     console.log(`[TIP-PRINTER] ${donationData.username} has donated ${donationData.amount}!`);
     await donationPrinter.printDonation(donationData);
 });

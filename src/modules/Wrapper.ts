@@ -6,7 +6,6 @@ import request from 'request';
 const HTTP = { GET: `GET`, POST: `POST`, PUT: `PUT`, DELETE: `DELETE` };
 
 export class Wrapper {
-
     base: string;
     jwt: string;
     accountId: string;
