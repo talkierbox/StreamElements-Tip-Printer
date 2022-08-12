@@ -37,7 +37,7 @@ StreamElements.getChannel().then(async (data) => {
     Client.emit(`ready`, data);
 });
 
-// Donations Map Constantly Updating
+// Donations Set - Constantly Updating
 let donoIDSet = new Set();
 
 StreamElements.getRecentTips().then(async (data: any) => {

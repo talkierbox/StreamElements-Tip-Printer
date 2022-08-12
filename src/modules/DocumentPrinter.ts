@@ -26,7 +26,7 @@ export class DonoPrinter {
     }
 
     private async downloadImage(url, donoID): Promise<Downloader.DownloadResult> {
-        if (await isImageURL(url)) {
+        try {
                 let img = await Downloader.image({
                     url: url,
                     dest: `../../${this.tempFilesPath}/img/${donoID}`,
@@ -34,7 +34,8 @@ export class DonoPrinter {
                 });
                 return img;
         }
-        else {
+        catch (err) {
+            console.log(`DocPrinter Error! ${err.toString() || null}`);
             return {filename: ``};
         }
     }
@@ -49,8 +50,7 @@ export class DonoPrinter {
         let donoMessage = ``;
 
         for (let i = 0; i < donationMessageSplitter.length; i++) {
-            let element = donationMessageSplitter[i].toLowerCase();
-            if (element.includes(`.png`) || element.includes(`.jpg`) || element.includes(`.jpeg`) || await isImageURL(donationMessageSplitter[i])) {
+            if (await isImageURL(donationMessageSplitter[i])) {
                 donoURL = donationMessageSplitter[i];
             }
             else {
