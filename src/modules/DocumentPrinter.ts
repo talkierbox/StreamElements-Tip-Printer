@@ -21,8 +21,7 @@ export class DonoPrinter {
         this.purgePDFs();
         this.purgeImages();
 
-        if (printingEnabled) this.printingEnabled = true;
-        else this.printingEnabled = false;
+        this.printingEnabled = printingEnabled;
     }
 
     private async downloadImage(url, donoID): Promise<Downloader.DownloadResult> {
@@ -77,7 +76,7 @@ export class DonoPrinter {
 
         if (donoURL) {
             await this.downloadImage(donoURL, dono.id).then(async (data) => {
-                if (data.filename) {
+                if (data.filename && fs.existsSync(data.filename)) {
                     await doc.image(data.filename, {
                         fit: [400, 400],
                         align: `center`,
@@ -105,7 +104,7 @@ export class DonoPrinter {
             filePathsToDel.forEach(async (path) => {
                 if (fs.existsSync(path)) fs.unlinkSync(path);
             });
-        }, 10 * 1000);
+        }, 12 * 1000);
     }
 
     async purgePDFs(): Promise<void> {

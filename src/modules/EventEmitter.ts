@@ -43,7 +43,7 @@ let donoIDSet = new Set();
 StreamElements.getRecentTips().then(async (data: any) => {
     data.recent.forEach(async (dataPiece) => {
         donoIDSet.add(dataPiece[`_id`]);
-        if (dataPiece[`status`] != `success`) return;
+        if (dataPiece[`status`] !== `success`) return;
     });
 });
 
@@ -55,7 +55,7 @@ setInterval(async () => {
         if (donoIDSet.has(dataPiece[`_id`])) return;
 
         // Skip bad donos
-        if (dataPiece[`status`] != `success`) return;
+        if (dataPiece[`status`] !== `success`) return;
 
         // Trigger the event
         donoIDSet.add(dataPiece[`_id`]); // Add the dono ID to the seen dono ID set
@@ -73,5 +73,4 @@ setInterval(async () => {
 
         Client.emit(`donation`, donoInfoObj);
     });
-
 }, 10 * 1000);

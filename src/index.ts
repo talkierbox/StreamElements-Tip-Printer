@@ -18,7 +18,12 @@ Client.on(`ready`, async (data) => {
 Client.on(`donation`, async (donationData: Donation) => {
     if (settings.minimumDonationAmount > donationData.amount) return;
     console.log(`[TIP-PRINTER] ${donationData.username} has donated ${donationData.amount}!`);
-    await donationPrinter.printDonation(donationData);
+    try {
+        await donationPrinter.printDonation(donationData);
+    } catch (err) {
+        console.log(`[ERROR] Error! Program should continue working as usual, but report this!`);
+        console.dir(err);
+    }
 });
 
 setTimeout(()=> {
