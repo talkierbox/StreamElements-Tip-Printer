@@ -30,5 +30,5 @@ setTimeout(()=> {
     // Create fake donations here!
     //  amount, message, username
     // createFakeDonation(10, `Thanks!`, `talkierbox`);
-    // createFakeDonation(10, "Hello There! https://picsum.photos/200/300", "Ur Dad");
+    // createFakeDonation(10, `Hello There!`, `Ur Dad`);
 }, 5 * 1000); // Sends the messages 5 later

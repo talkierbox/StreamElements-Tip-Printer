@@ -1,6 +1,6 @@
 import * as printKit from 'pdf-to-printer';
 import { Donation } from './EventEmitter';
-import * as Downloader from 'image-downloader';
+import download from 'image-download';
 import fs from 'fs';
 import path from 'path';
 import PDFKit from 'pdfkit';
@@ -24,18 +24,23 @@ export class DonoPrinter {
         this.printingEnabled = printingEnabled;
     }
 
-    private async downloadImage(url, donoID): Promise<Downloader.DownloadResult> {
+    private async downloadImage(url: string, dono: Donation, callback: any): Promise<null> {
         try {
-                let img = await Downloader.image({
-                    url: url,
-                    dest: `../../${this.tempFilesPath}/img/${donoID}`,
-                    extractFilename: false
+            // await download(url, `../../${this.tempFilesPath}/img/${dono.id}`);
+            download(url).then(async (buffer) => {
+                !buffer ? await callback() : fs.writeFile( `./${this.tempFilesPath}/img/${dono.id}.jpg`, buffer, async (err) => {
+                    if (err) {
+                        console.log(`Non-fatal error! Report this, but no need to panic. The program will still run  :)`);
+                        console.dir(err);
+                    } else {
+                        await callback();
+                    }
                 });
-                return img;
+            });
         }
         catch (err) {
             console.log(`DocPrinter Error! ${err.toString() || null}`);
-            return {filename: ``};
+            return;
         }
     }
 
@@ -49,12 +54,7 @@ export class DonoPrinter {
         let donoMessage = ``;
 
         for (let i = 0; i < donationMessageSplitter.length; i++) {
-            if (await isImageURL(donationMessageSplitter[i])) {
-                donoURL = donationMessageSplitter[i];
-            }
-            else {
-                donoMessage += donationMessageSplitter[i] + ` `;
-            }
+            (await isImageURL(donationMessageSplitter[i])) ? donoURL = donationMessageSplitter[i] : donoMessage += donationMessageSplitter[i] + ` `;
         }
 
         let doc = new PDFKit();
@@ -70,14 +70,14 @@ export class DonoPrinter {
 
         if (donoMessage) {
             // Add the Donation Message
-            doc.font(`./fonts/Lato-Regular.ttf`).fontSize(23)
-            .text(donoMessage, 100, 100);
+            doc.font(`./fonts/Lato-Regular.ttf`).fontSize(23).text(donoMessage, 100, 100);
         }
 
         if (donoURL) {
-            await this.downloadImage(donoURL, dono.id).then(async (data) => {
-                if (data.filename && fs.existsSync(data.filename)) {
-                    await doc.image(data.filename, {
+            let tempURL = this.tempFilesPath;
+            await this.downloadImage(donoURL, dono, async () => {
+                if (fs.existsSync(`./${tempURL}/img/${dono.id}.jpg`)) {
+                    await doc.image(`./${tempURL}/img/${dono.id}.jpg`, {
                         fit: [400, 400],
                         align: `center`,
                         valign: `center`,
@@ -85,9 +85,9 @@ export class DonoPrinter {
                     });
 
                     await doc.end();
-                    if (this.printingEnabled) printKit.print(`${this.tempFilesPath}/printables/donation_${dono.id}.pdf`);
+                    if (this.printingEnabled) printKit.print(`${tempURL}/printables/donation_${dono.id}.pdf`);
 
-                    filePathsToDel.push(data.filename);
+                    filePathsToDel.push(`./${tempURL}/img/${dono.id}.jpg`);
                 } else {
                     await doc.end();
                     if (this.printingEnabled) printKit.print(`${this.tempFilesPath}/printables/donation_${dono.id}.pdf`);
@@ -104,7 +104,7 @@ export class DonoPrinter {
             filePathsToDel.forEach(async (path) => {
                 if (fs.existsSync(path)) fs.unlinkSync(path);
             });
-        }, 12 * 1000);
+        }, 30 * 1000); // Delete the files after 30 seconds
     }
 
     async purgePDFs(): Promise<void> {
@@ -112,9 +112,9 @@ export class DonoPrinter {
             if (err) throw err;
             for (const file of files) {
                 if (file.endsWith(`.txt`)) continue;
-            fs.unlink(path.join(`${this.tempFilesPath}/printables`, file), err => {
-                if (err) throw err;
-            });
+                fs.unlink(path.join(`${this.tempFilesPath}/printables`, file), err => {
+                    if (err) throw err;
+                });
             }
         });
         console.log(`[PRINTER] Purged All PDFs!`);
@@ -126,9 +126,9 @@ export class DonoPrinter {
 
             for (const file of files) {
                 if (file.endsWith(`.txt`)) continue;
-            fs.unlink(path.join(`${this.tempFilesPath}/img`, file), err => {
-                if (err) throw err;
-            });
+                fs.unlink(path.join(`${this.tempFilesPath}/img`, file), err => {
+                    if (err) throw err;
+                });
             }
         });
         console.log(`[PRINTER] Purged All Images!`);
