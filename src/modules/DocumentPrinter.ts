@@ -4,6 +4,7 @@ import download from 'image-download';
 import fs from 'fs';
 import path from 'path';
 import PDFKit from 'pdfkit';
+
 const isImageURL = require(`image-url-validator`).default;
 
 export class DonoPrinter {
@@ -24,11 +25,11 @@ export class DonoPrinter {
         this.printingEnabled = printingEnabled;
     }
 
-    private async downloadImage(url: string, dono: Donation, callback: any): Promise<null> {
+    private async downloadImage(url: string, dono: Donation, callback: () => Promise<void>): Promise<null> {
         try {
             // await download(url, `../../${this.tempFilesPath}/img/${dono.id}`);
             download(url).then(async (buffer) => {
-                !buffer ? await callback() : fs.writeFile( `./${this.tempFilesPath}/img/${dono.id}.jpg`, buffer, async (err) => {
+                !buffer ? await callback() : fs.writeFile( `${this.tempFilesPath}/img/${dono.id}.jpg`, buffer, async (err) => {
                     if (err) {
                         console.log(`Non-fatal error! Report this, but no need to panic. The program will still run  :)`);
                         console.dir(err);
@@ -76,27 +77,48 @@ export class DonoPrinter {
         if (donoURL) {
             let tempURL = this.tempFilesPath;
             await this.downloadImage(donoURL, dono, async () => {
-                if (fs.existsSync(`./${tempURL}/img/${dono.id}.jpg`)) {
-                    await doc.image(`./${tempURL}/img/${dono.id}.jpg`, {
-                        fit: [400, 400],
-                        align: `center`,
-                        valign: `center`,
-                        y: 300
+                if (fs.existsSync(`${tempURL}/img/${dono.id}.jpg`)) {
+                    try {
+                        await doc.image(`${tempURL}/img/${dono.id}.jpg`, {
+                            fit: [400, 400],
+                            align: `center`,
+                            valign: `center`,
+                            y: 300
+                        });
+                    } catch (error1) {
+                        console.log(`[ERROR] Image-setting non-fatal error. Please report!`);
+                        console.dir(error1);
+
+                        await doc.end();
+                        if (this.printingEnabled && fs.existsSync(`${tempURL}/printables/donation_${dono.id}.pdf`)) printKit.print(`${tempURL}/printables/donation_${dono.id}.pdf`).catch((err) => {
+                            console.log(`[ERROR] Printing-related non-fatal error. Please report!`);
+                            console.dir(err);
+                        });
+                    }
+
+
+                    await doc.end();
+                    if (this.printingEnabled && fs.existsSync(`${tempURL}/printables/donation_${dono.id}.pdf`)) printKit.print(`${tempURL}/printables/donation_${dono.id}.pdf`).catch((err) => {
+                        console.log(`[ERROR] Printing-related non-fatal error. Please report!`);
+                        console.dir(err);
                     });
 
-                    await doc.end();
-                    if (this.printingEnabled) printKit.print(`${tempURL}/printables/donation_${dono.id}.pdf`);
-
-                    filePathsToDel.push(`./${tempURL}/img/${dono.id}.jpg`);
+                    filePathsToDel.push(`${tempURL}/img/${dono.id}.jpg`);
                 } else {
                     await doc.end();
-                    if (this.printingEnabled) printKit.print(`${this.tempFilesPath}/printables/donation_${dono.id}.pdf`);
+                    if (this.printingEnabled && fs.existsSync(`${tempURL}/printables/donation_${dono.id}.pdf`)) printKit.print(`${this.tempFilesPath}/printables/donation_${dono.id}.pdf`).catch((err) => {
+                        console.log(`[ERROR] Printing-related non-fatal error. Please report!`);
+                        console.dir(err);
+                    });
                 }
             });
         }
         else {
             await doc.end();
-            if (this.printingEnabled) printKit.print(`${this.tempFilesPath}/printables/donation_${dono.id}.pdf`);
+            if (this.printingEnabled && fs.existsSync(`${this.tempFilesPath}/printables/donation_${dono.id}.pdf`)) printKit.print(`${this.tempFilesPath}/printables/donation_${dono.id}.pdf`).catch((err) => {
+                console.log(`[ERROR] Printing-related non-fatal error. Please report!`);
+                console.dir(err);
+            });
         }
 
         // Delete the files
