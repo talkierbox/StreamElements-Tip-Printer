@@ -21,7 +21,6 @@
   },
   "dependencies": {
     "axios": "^0.27.2",
-    "image-download": "^2.1.0",
     "image-url-validator": "^1.0.4",
     "node-printer": "^1.0.4",
     "node-streamelements": "^0.1.3",

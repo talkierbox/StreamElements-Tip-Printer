@@ -26,9 +26,18 @@ Client.on(`donation`, async (donationData: Donation) => {
     }
 });
 
-setTimeout(()=> {
-    // Create fake donations here!
-    //  amount, message, username
-    // createFakeDonation(10, `Thanks!`, `talkierbox`);
-    // createFakeDonation(10, `Hello There!`, `Ur Dad`);
-}, 5 * 1000); // Sends the messages 5 later
+process.on(`uncaughtException`, (err) => {
+    console.log(`Non-fatal error. Please report: `);
+    console.dir(err);
+});
+
+// setTimeout(()=> {
+//     // Create fake donations here!
+//     //  amount, message, username
+//     createFakeDonation(10, `Thanks! https://i.ibb.co/9n4g7Z3/Stanford-Grin.png`, `talkierbox`);
+//     createFakeDonation(10, `Hello There!`, `Ur Dad`);
+// }, 5 * 1000); // Sends the messages 5 later
+
+// setTimeout(() => {
+//     createFakeDonation(10, `Thanks 2! https://i.ibb.co/FngTrJw/Stanford-Grin.png`, `talkierbox`);
+// }, 10 * 1000);

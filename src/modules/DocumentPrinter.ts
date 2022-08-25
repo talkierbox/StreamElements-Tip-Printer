@@ -1,11 +1,28 @@
 import * as printKit from 'pdf-to-printer';
 import { Donation } from './EventEmitter';
-import download from 'image-download';
 import fs from 'fs';
 import path from 'path';
 import PDFKit from 'pdfkit';
+import request from 'request';
 
 const isImageURL = require(`image-url-validator`).default;
+
+async function download(uri, filename, callback): Promise<void> {
+    request.head(uri, async (err, res)=> {
+      if(res.headers[`content-type`] && ((res.headers[`content-type`]).match(/(image)+\//g)).length != 0){
+        let imgReq = request(uri).pipe(fs.createWriteStream(filename)).on(`close`, callback);
+            imgReq.on(`error`, (err) => {
+            console.log(`Non-fatal Error Downloading Image. Moving on....`);
+            console.dir(err);
+            return;
+        });
+      }
+      else {
+        callback();
+      }
+      return;
+    });
+}
 
 export class DonoPrinter {
     tempFilesPath: string;
@@ -27,17 +44,7 @@ export class DonoPrinter {
 
     private async downloadImage(url: string, dono: Donation, callback: () => Promise<void>): Promise<null> {
         try {
-            // await download(url, `../../${this.tempFilesPath}/img/${dono.id}`);
-            download(url).then(async (buffer) => {
-                !buffer ? await callback() : fs.writeFile( `${this.tempFilesPath}/img/${dono.id}.jpg`, buffer, async (err) => {
-                    if (err) {
-                        console.log(`Non-fatal error! Report this, but no need to panic. The program will still run  :)`);
-                        console.dir(err);
-                    } else {
-                        await callback();
-                    }
-                });
-            });
+            await download(url, `${this.tempFilesPath}/img/${dono.id}.jpg`, callback);
         }
         catch (err) {
             console.log(`DocPrinter Error! ${err.toString() || null}`);
