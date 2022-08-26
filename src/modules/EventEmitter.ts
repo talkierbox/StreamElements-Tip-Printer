@@ -5,7 +5,6 @@ import {Wrapper} from './Wrapper';
 
 let randomstring = require(`randomstring`);
 
-
 export let StreamElements = new Wrapper(settings.jwtToken, settings.accountID);
 export let Client = new events.EventEmitter();
 
@@ -42,13 +41,12 @@ let donoIDSet = new Set();
 
 StreamElements.getRecentTips().then(async (data: any) => {
     data.recent.forEach(async (dataPiece) => {
-        donoIDSet.add(dataPiece[`_id`]);
         if (dataPiece[`status`] !== `success`) return;
+        donoIDSet.add(dataPiece[`_id`]);
     });
 });
 
-// Constantly check for new Donations
-setInterval(async () => {
+let runNewTips = async (): Promise<void> => {
     let recentTips: any = await StreamElements.getRecentTips();
     recentTips.recent.forEach(async (dataPiece) => {
         // Skip donos that are already present
@@ -73,4 +71,9 @@ setInterval(async () => {
 
         Client.emit(`donation`, donoInfoObj);
     });
-}, 10 * 1000);
+};
+
+setTimeout(runNewTips, 3000);
+
+// Constantly check for new Donations
+setInterval(runNewTips, 45 * 1000); // Check for new donations every one minute

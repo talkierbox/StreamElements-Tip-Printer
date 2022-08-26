@@ -9,7 +9,7 @@ const isImageURL = require(`image-url-validator`).default;
 
 async function download(uri, filename, callback): Promise<void> {
     request.head(uri, async (err, res)=> {
-      if(res.headers[`content-type`] && ((res.headers[`content-type`]).match(/(image)+\//g)).length != 0){
+      if(res.headers[`content-type`] && ((res.headers[`content-type`]).match(/(image)+\//g)).length != 0) {
         let imgReq = request(uri).pipe(fs.createWriteStream(filename)).on(`close`, callback);
             imgReq.on(`error`, (err) => {
             console.log(`Non-fatal Error Downloading Image. Moving on....`);
@@ -17,10 +17,7 @@ async function download(uri, filename, callback): Promise<void> {
             return;
         });
       }
-      else {
-        callback();
-      }
-      return;
+      else callback();
     });
 }
 
