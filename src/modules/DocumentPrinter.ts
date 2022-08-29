@@ -39,6 +39,13 @@ export class DonoPrinter {
         this.printingEnabled = printingEnabled;
     }
 
+    private async sendToPrinter(path: string): Promise<void> {
+        setTimeout(() => {
+            fs.existsSync(path) ? printKit.print(path) : console.log(`[TIP PRINTER] Path doesn't exist for dono! Ignoring...`);
+        }, 3000);
+        return;
+    }
+
     private async downloadImage(url: string, dono: Donation, callback: () => Promise<void>): Promise<null> {
         try {
             await download(url, `${this.tempFilesPath}/img/${dono.id}.jpg`, callback);
@@ -78,8 +85,11 @@ export class DonoPrinter {
             doc.font(`./fonts/Lato-Regular.ttf`).fontSize(23).text(donoMessage, 100, 100);
         }
 
+        let tempURL = this.tempFilesPath;
+        let isPrintingEnabled = this.printingEnabled;
+
+
         if (donoURL) {
-            let tempURL = this.tempFilesPath;
             await this.downloadImage(donoURL, dono, async () => {
                 if (fs.existsSync(`${tempURL}/img/${dono.id}.jpg`)) {
                     try {
@@ -94,7 +104,7 @@ export class DonoPrinter {
                         console.dir(error1);
 
                         await doc.end();
-                        if (this.printingEnabled && fs.existsSync(`${tempURL}/printables/donation_${dono.id}.pdf`)) printKit.print(`${tempURL}/printables/donation_${dono.id}.pdf`).catch((err) => {
+                        if (isPrintingEnabled) this.sendToPrinter(`${tempURL}/printables/donation_${dono.id}.pdf`).catch((err) => {
                             console.log(`[ERROR] Printing-related non-fatal error. Please report!`);
                             console.dir(err);
                         });
@@ -102,7 +112,7 @@ export class DonoPrinter {
 
 
                     await doc.end();
-                    if (this.printingEnabled && fs.existsSync(`${tempURL}/printables/donation_${dono.id}.pdf`)) printKit.print(`${tempURL}/printables/donation_${dono.id}.pdf`).catch((err) => {
+                    if (isPrintingEnabled) this.sendToPrinter(`${tempURL}/printables/donation_${dono.id}.pdf`).catch((err) => {
                         console.log(`[ERROR] Printing-related non-fatal error. Please report!`);
                         console.dir(err);
                     });
@@ -110,7 +120,7 @@ export class DonoPrinter {
                     filePathsToDel.push(`${tempURL}/img/${dono.id}.jpg`);
                 } else {
                     await doc.end();
-                    if (this.printingEnabled && fs.existsSync(`${tempURL}/printables/donation_${dono.id}.pdf`)) printKit.print(`${this.tempFilesPath}/printables/donation_${dono.id}.pdf`).catch((err) => {
+                    if (isPrintingEnabled) this.sendToPrinter(`${tempURL}/printables/donation_${dono.id}.pdf`).catch((err) => {
                         console.log(`[ERROR] Printing-related non-fatal error. Please report!`);
                         console.dir(err);
                     });
@@ -119,10 +129,9 @@ export class DonoPrinter {
         }
         else {
             await doc.end();
-            if (this.printingEnabled && fs.existsSync(`${this.tempFilesPath}/printables/donation_${dono.id}.pdf`)) printKit.print(`${this.tempFilesPath}/printables/donation_${dono.id}.pdf`).catch((err) => {
-                console.log(`[ERROR] Printing-related non-fatal error. Please report!`);
-                console.dir(err);
-            });
+            if (isPrintingEnabled)  {
+                this.sendToPrinter(`${tempURL}/printables/donation_${dono.id}.pdf`);
+            }
         }
 
         // Delete the files
